@@ -82,9 +82,11 @@ func selectionSort(arr []int) []int {
 
 /*
 	Merge sort
-	merge sort是很經典的"divide and conquer"案例。
+	merge sort是很經典的"divide and merge"案例。
 	merge sort利用拆分與合併兩個排列好的陣列兩個優點實現O(n logn n)的時間複雜度
 	原理就是把未排序的大陣列切成以一個元素為單位的小陣列，再將之一個一個合併回排列好的大陣列。
+	其實你會發現，merge sort就是Preorder Traversal。
+	如果今天陣列的長度為n，要拆分log(2,n)次，且每一層要排序n次，所以mergesort的複雜度是n*log(2,n)
 */
 
 func mergeSort(arr []int) []int {
