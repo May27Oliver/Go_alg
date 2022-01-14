@@ -3,21 +3,31 @@ package main
 import "fmt"
 
 var x = []int{4, 7, 1, 2, 5, 3, 8, 10, 33, 6, 77, 100, 101}
-var y = []int{10, 20, 30, 5, 7, 9, 11, 13, 15, 17}
+var y = []int{10, 20, 30, 5, 7, 9, 11, 13, 15, 17, 35}
 
 func main() {
-	// y := mergeSort(x)
-	// fmt.Print(y)
+	y := mergeSort(x)
+	fmt.Println("merge sort", y)
 
 	m := &MaxHeap{}
-	for _, v := range y {
+	res := []int{}
+	for _, v := range x {
 		m.Insert(v)
-		fmt.Println(m)
 	}
-	for i := 0; i < 5; i++ {
-		m.Extract()
-		fmt.Println(m)
+	for i := 0; i < len(x); i++ {
+		res = append(res, m.Extract())
 	}
+	fmt.Println("heap sort(max)", res)
+
+	n := &MinHeap{}
+	resMin := []int{}
+	for _, v := range x {
+		n.InsertMin(v)
+	}
+	for i := 0; i < len(x); i++ {
+		resMin = append(resMin, n.ExtractMin())
+	}
+	fmt.Println("heap sort(min)", resMin)
 }
 
 /* n^2 系列*/
@@ -104,7 +114,7 @@ func selectionSort(arr []int) []int {
 */
 
 func mergeSort(arr []int) []int {
-	fmt.Println("拆分 arr", arr)
+	// fmt.Println("拆分 arr", arr)
 	//拆分
 	if len(arr) > 1 {
 		midIdx := len(arr) / 2
@@ -117,7 +127,7 @@ func mergeSort(arr []int) []int {
 }
 
 func merge(left_arr, right_arr []int) []int {
-	fmt.Println("合併left_arr", left_arr, "right_arr", right_arr)
+	// fmt.Println("合併left_arr", left_arr, "right_arr", right_arr)
 	final := []int{}
 	i := 0
 	j := 0
@@ -131,14 +141,14 @@ func merge(left_arr, right_arr []int) []int {
 		}
 	}
 	//上面迴圈跑完，左右陣列一定還會遺留一些值，大於final內的任何值，下面用loop將之加入
-	fmt.Println("合併run after for", final)
+	// fmt.Println("合併run after for", final)
 	for ; i < len(left_arr); i++ {
 		final = append(final, left_arr[i])
 	}
 	for ; j < len(right_arr); j++ {
 		final = append(final, right_arr[j])
 	}
-	fmt.Println("合併run after append", final)
+	// fmt.Println("合併run after append", final)
 	return final
 }
 
@@ -209,91 +219,141 @@ func merge(left_arr, right_arr []int) []int {
 
 /*
 藉由max heap tree來進行sorting的排序法。
-1. struct for maxheap
-2. insert method
-3. extract method
+Heap sort
+1. build MaxHeap struct
+2. func Insert which append the new element to the final slice,then maxHeapifyUp it to the right place
+3. func Extract the root element which is the largest num in the max heap tree, swap the root and the final element,then remove the root,maxHeapifyDown the new root to the right place.
+4. func HeapifyUp,let the node of index get from parameter compare with its parent node,if larger than parent node,swap it, until it find the right place to go
+5. func HeapifyDown, let the node of index get from parameter compare with their child nodes,if smaller than child node, swap it ,until node of index find the right place to go.
+6. func swap , switch two element's position in slice.
+7. parent, left, right,got index and find their parent, left child, right child.
+
+maxHeapifyDown 是O(log n)
+maxHeapifyUp 也是O(log n)
 */
 
-//maxHeap struct has a slice that holds the array
 type MaxHeap struct {
-	array []int
+	arr []int
 }
 
-//Insert adds an element to the heap
-func (h *MaxHeap) Insert(key int) {
-	h.array = append(h.array, key)   //將新值加入陣列最末
-	h.maxHeapifyUp(len(h.array) - 1) //把最末的index投入maxHeapifyUp中進行heapifyUp
+func (h *MaxHeap) Insert(value int) {
+	h.arr = append(h.arr, value)
+	h.maxHeapifyUp(len(h.arr) - 1)
 }
 
-//Extract returns the largest key, and removes it from the heap
 func (h *MaxHeap) Extract() int {
-	extracted := h.array[0]
-	l := len(h.array) - 1
-
-	//when array is empty
-	if len(h.array) == 0 {
-		fmt.Println("cannont extract because array length is 0")
+	if len(h.arr) == 0 {
+		fmt.Println("there is no more element can be extracted.")
 		return -1
 	}
-	// take out the last index and put it in the root
-	h.array[0] = h.array[l]
-	h.array = h.array[:l]
+	extracted := h.arr[0]
+	l := len(h.arr) - 1
+	h.arr[0] = h.arr[len(h.arr)-1]
+	h.arr = h.arr[:l]
 	h.maxHeapifyDown(0)
 	return extracted
 }
 
-// maxHeapifyUp will heapify from bottom top
-func (h *MaxHeap) maxHeapifyUp(index int) {
-	//給index參數告訴array heapifyUp該從何開始
-	for h.array[parent(index)] < h.array[index] {
-		h.swap(parent(index), index)
-		index = parent(index)
+func (h *MaxHeap) maxHeapifyUp(i int) {
+	for h.arr[i] > h.arr[parent(i)] {
+		h.swap(i, parent(i))
+		i = parent(i)
 	}
 }
 
-// maxHeapifyDown will heapify top to bottom
-func (h *MaxHeap) maxHeapifyDown(index int) {
-	lastIndex := len(h.array) - 1
-	l, r := left(index), right(index)
-	childToCompare := 0
-	// loop while index has at least one child
+func (h *MaxHeap) maxHeapifyDown(i int) {
+	l, r := left(i), right(i)
+	lastIndex := len(h.arr) - 1
+	compareIndx := 0
 	for l <= lastIndex {
-		if l == lastIndex { // when left child is the only child
-			childToCompare = l
-		} else if h.array[l] > h.array[r] { // when left child is larger
-			childToCompare = l
-		} else { // when right child is larger
-			childToCompare = r
+		if l == lastIndex {
+			compareIndx = l
+		} else if h.arr[l] > h.arr[r] {
+			compareIndx = l
+		} else {
+			compareIndx = r
 		}
 
-		if h.array[index] < h.array[childToCompare] {
-			h.swap(index, childToCompare)
-			index = childToCompare
-			l, r = left(index), right(index)
+		if h.arr[i] < h.arr[compareIndx] {
+			h.swap(i, compareIndx)
+			i = compareIndx
+			l, r = left(i), right(i)
 		} else {
 			return
 		}
 	}
 }
 
-//swap keys in the array
 func (h *MaxHeap) swap(i1, i2 int) {
-	h.array[i1], h.array[i2] = h.array[i2], h.array[i1]
+	h.arr[i1], h.arr[i2] = h.arr[i2], h.arr[i1]
 }
 
-//get the parent index
 func parent(i int) int {
 	return (i - 1) / 2
 }
 
-//get the left child index,
-//left child index = parent index * 2 + 1
 func left(i int) int {
-	return 2*i + 1
+	return i*2 + 1
 }
 
-//get the right child index,
-//right child index = parent index * 2 + 2
 func right(i int) int {
-	return 2*i + 2
+	return i*2 + 2
+}
+
+type MinHeap struct {
+	arr []int
+}
+
+func (h *MinHeap) InsertMin(value int) {
+	h.arr = append(h.arr, value)
+	h.minHeapifyUp(len(h.arr) - 1)
+}
+
+func (h *MinHeap) ExtractMin() int {
+	if len(h.arr) == 0 {
+		fmt.Println("there is no more element to extracted!")
+		return -1
+	}
+	l := len(h.arr) - 1
+	extracted := h.arr[0]
+	h.arr[0] = h.arr[l]
+
+	h.arr = h.arr[:l]
+	h.minHeapifyDown(0)
+	return extracted
+}
+
+func (h *MinHeap) minHeapifyUp(i int) {
+	for h.arr[i] < h.arr[parent(i)] {
+		h.swapMin(i, parent(i))
+		i = parent(i)
+	}
+}
+
+func (h *MinHeap) minHeapifyDown(i int) {
+	l, r := left(i), right(i)
+	lastIndex := len(h.arr) - 1
+	compareIdx := 0
+
+	for l <= lastIndex {
+		if l == lastIndex {
+			compareIdx = l
+		} else if h.arr[l] > h.arr[r] {
+			compareIdx = r
+		} else {
+			compareIdx = l
+		}
+
+		if h.arr[i] > h.arr[compareIdx] {
+			h.swapMin(i, compareIdx)
+			i = compareIdx
+			l, r = left(i), right(i)
+		} else {
+			return
+		}
+	}
+}
+
+func (h *MinHeap) swapMin(i1, i2 int) {
+	h.arr[i1], h.arr[i2] = h.arr[i2], h.arr[i1]
 }
