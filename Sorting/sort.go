@@ -6,28 +6,30 @@ var x = []int{4, 7, 1, 2, 5, 3, 8, 10, 33, 6, 77, 100, 101}
 var y = []int{10, 20, 30, 5, 7, 9, 11, 13, 15, 17, 35}
 
 func main() {
-	y := mergeSort(x)
-	fmt.Println("merge sort", y)
+	z := quichSortWithPartition(x,0,len(x)-1,"開始")
+	fmt.Println("quick sort", z)
+	// y := mergeSort(x)
+	// fmt.Println("merge sort", y)
 
-	m := &MaxHeap{}
-	res := []int{}
-	for _, v := range x {
-		m.Insert(v)
-	}
-	for i := 0; i < len(x); i++ {
-		res = append(res, m.Extract())
-	}
-	fmt.Println("heap sort(max)", res)
+	// m := &MaxHeap{}
+	// res := []int{}
+	// for _, v := range x {
+	// 	m.Insert(v)
+	// }
+	// for i := 0; i < len(x); i++ {
+	// 	res = append(res, m.Extract())
+	// }
+	// fmt.Println("heap sort(max)", res)
 
-	n := &MinHeap{}
-	resMin := []int{}
-	for _, v := range x {
-		n.InsertMin(v)
-	}
-	for i := 0; i < len(x); i++ {
-		resMin = append(resMin, n.ExtractMin())
-	}
-	fmt.Println("heap sort(min)", resMin)
+	// n := &MinHeap{}
+	// resMin := []int{}
+	// for _, v := range x {
+	// 	n.InsertMin(v)
+	// }
+	// for i := 0; i < len(x); i++ {
+	// 	resMin = append(resMin, n.ExtractMin())
+	// }
+	// fmt.Println("heap sort(min)", resMin)
 }
 
 /* n^2 系列*/
@@ -356,4 +358,81 @@ func (h *MinHeap) minHeapifyDown(i int) {
 
 func (h *MinHeap) swapMin(i1, i2 int) {
 	h.arr[i1], h.arr[i2] = h.arr[i2], h.arr[i1]
+}
+
+/*
+Quick Sort 
+Partition:是QuickSort的根本algorithm。
+設定最後一位為pivot，
+put number less than pivot partition in pivot left side,
+greater than pivot partition in the right side.
+than recursion Partition function while less and greater slice finished.
+將slice中小於pivot的數字放在pivot左邊，大於pivot的數字放在pivot右邊。
+
+Quick Sort有兩種，一種是有用Partition的，一種沒有，沒有的會需要比較多的空間複雜度。
+*/
+//Without Partition
+func quickSort1(arr []int)[]int{
+	if len(arr)<2{
+		return arr
+	}
+	pivot := arr[len(arr)-1]
+	// fmt.Println("pivot",pivot)
+	final,left,right:=[]int{},[]int{},[]int{}
+
+	for i,v := range arr{
+		if i == len(arr)-1{
+			break
+		}else	if v < pivot{
+			left=append(left,v)
+		}else{
+			right=append(right,v)
+		}
+	}
+
+	left = quickSort1(left)
+	right = quickSort1(right)
+
+	final = append(final,left...)
+	final = append(final,pivot)
+	final = append(final,right...)
+
+	return final
+}
+
+func quicksort_swap (arr []int, i1 ,i2 int)[]int{
+	arr[i1],arr[i2] = arr[i2],arr[i1]
+	return arr
+}
+
+/*
+with partition
+partition給定範圍start和end，和兩個pointer i 和 j
+在start和end的範圍中去比較其內的元素跟pivot之間的大小關係，
+j遍歷array，如果遇到較pivot小的值，j和i就swap，交換位置，然後i往前一格。
+j遍歷完陣列後，pivot再跟最後的i值交換位置，如此就會形成pivot左邊比pivot小
+pivot右邊比pivot大的形勢。
+*/
+func partition(arr []int, start, end int)([]int,int){
+	pivot := arr[end]
+	i := start
+	for j:=start;j<end;j++{
+		if arr[j] < pivot{
+			arr[i],arr[j]=arr[j],arr[i]
+			i++
+		}
+	}
+	arr[i],arr[end] = arr[end],arr[i]
+	return arr,i
+}
+
+func quichSortWithPartition(arr []int,start,end int,way string)[]int{
+	if start < end {
+		fmt.Println("start",start,"end",end ,"位置",way)
+		var pivot int
+		arr,pivot = partition(arr,start,end)
+		arr = quichSortWithPartition(arr,start,pivot-1,"左")
+		arr = quichSortWithPartition(arr,pivot+1,end,"右")
+	}
+	return arr
 }
