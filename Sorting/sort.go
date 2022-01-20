@@ -370,6 +370,11 @@ than recursion Partition function while less and greater slice finished.
 將slice中小於pivot的數字放在pivot左邊，大於pivot的數字放在pivot右邊。
 
 Quick Sort有兩種，一種是有用Partition的，一種沒有，沒有的會需要比較多的空間複雜度。
+
+quick sort 
+worse case performance:O(n^2)
+Best case performance:O(n log n)
+Average performance:O(n log n)
 */
 //Without Partition
 func quickSortWithoutPartition(arr []int) []int {
@@ -436,3 +441,8 @@ func quickSortWithPartition(arr []int, start, end int) []int {
 	}
 	return arr
 }
+
+/*
+lower bound searching最小就是logn，不能再更小了
+master theorem
+*/
