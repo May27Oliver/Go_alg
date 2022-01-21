@@ -8,8 +8,8 @@ var y = []int{10, 20, 30, 5, 7, 9, 11, 13, 15, 17, 35}
 func main() {
 	z := quickSortWithPartition(x, 0, len(x)-1)
 	fmt.Println("quick sort", z)
-	// y := mergeSort(x)
-	// fmt.Println("merge sort", y)
+	y := mergeSort(x)
+	fmt.Println("merge sort", y)
 
 	m := &MaxHeap{}
 	res := []int{}

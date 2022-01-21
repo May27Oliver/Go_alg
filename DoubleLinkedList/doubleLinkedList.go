@@ -2,33 +2,34 @@ package main
 
 import "fmt"
 
-/*
-Linked List
-Linked List串列和array一樣都是有序的存放元素的集合，
-1.惟串列在記憶體中並不是連續放置，每個元素由一個存放元素本身的節點和一個指向下一個元素的pointer組成。
-2.刪掉值和增加值的速度會比array快很多，只要讓next不只向它即可。
-串列的好處在於添加或移除元素時不需要移動其他元素，但找尋串列中的某個元素必須從頭找起，陣列則可以直接找到元素。
-*/
-type node struct {
+type Node struct{
 	data int
-	next *node
+	next *Node
+	prev *Node
 }
 
-type linkedList struct {
-	head   *node
+type LinkedList struct{
+	head *Node
+	tail *Node
 	length int
 }
 
 //在串列中最前面插入元素
-func (l *linkedList) prepend(n *node) {
-	second := l.head
-	l.head = n
-	l.head.next = second
+func (l *LinkedList) prepend(n *Node) {
+	if l.head == nil{
+		l.head = n
+		l.tail = n
+	}else{
+		n.next = l.head
+		l.head.prev = n
+		l.head = n
+	}
 	l.length++
+	return
 }
 
 //刪除串列中的值
-func (l *linkedList) deleteValue(value int) {
+func (l *LinkedList) deleteValue(value int) {
 	//串列為空返回
 	if l.length == 0{
 		return
@@ -36,6 +37,7 @@ func (l *linkedList) deleteValue(value int) {
 	//數值與head.data相等
 	if l.head.data == value{
 		l.head = l.head.next
+		l.head.prev = nil
 		l.length--
 		return
 	}
@@ -48,23 +50,23 @@ func (l *linkedList) deleteValue(value int) {
 		previousToDelete = previousToDelete.next
 	}
 	previousToDelete.next = previousToDelete.next.next
+	previousToDelete.next.prev = previousToDelete
 	l.length--
 }
 
 //在串列最後插入元素
-func (l *linkedList) append(val int){
-	pointer:=l.head
-	for pointer.next != nil{
-		pointer = pointer.next
-	}
-	pointer.next = &node{data:val}
+func (l *LinkedList) append(val int){
+	pointer:=l.tail
+	pointer.next = &Node{data:val}
+	pointer.next.prev = pointer
+	l.tail = pointer.next
 	l.length++
 }
 //在任意位置插入元素
-func (l *linkedList) insert(val, pos int){
+func (l *LinkedList) insert(val, pos int){
 	if pos < 2 {
 		fmt.Println("欲插入位置小於0，直接加入串列頭部！")
-		l.prepend(&node{data:val})
+		l.prepend(&Node{data:val})
 		return
 	} 
 	if pos > l.length - 1 {
@@ -80,12 +82,13 @@ func (l *linkedList) insert(val, pos int){
 	}
 	fmt.Println("listLen",listLen,"pos",pos)
 	temp := pointer.next
-	pointer.next = &node{data:val,next:temp}
+	pointer.next = &Node{data:val, next:temp, prev:pointer}
+	temp.prev = pointer.next
 	l.length++
 }
 
 //返回元素在串列中的索引
-func (l *linkedList) indexOf(el int)int{
+func (l *LinkedList) indexOf(el int)int{
 	pointer := l.head
 	var pos int
 	for pos = 0 ;pos<l.length; pos++{
@@ -98,7 +101,7 @@ func (l *linkedList) indexOf(el int)int{
 }
 
 //刪除串列中特定位置元素
-func (l *linkedList) deleteAt(pos int){
+func (l *LinkedList) deleteAt(pos int){
 	if pos > l.length-1{
 		return
 	}
@@ -109,26 +112,28 @@ func (l *linkedList) deleteAt(pos int){
 		i++
 	}
 	pointer.next = pointer.next.next
+	pointer.next.prev = pointer
 	l.length--
 }
 //印出所有的串列元素
-func (l linkedList) printListData() {
+func (l LinkedList) printListData() {
 	toPrint := l.head
 	for l.length != 0 {
 		fmt.Printf("%d \n", toPrint.data)
 		toPrint = toPrint.next
 		l.length--
 	}
-}
+} 
 
-func main() {
-	mylist := linkedList{}
-	mylist.prepend(&node{data: 48}) //實體化一個node data為48然後把記憶體位置prepend進linkedList
-	mylist.prepend(&node{data: 18})
-	mylist.prepend(&node{data: 16})
-	mylist.prepend(&node{data: 11})
-	mylist.prepend(&node{data: 7})
-	mylist.prepend(&node{data: 2})
+
+func main(){
+	mylist := LinkedList{}
+	mylist.prepend(&Node{data: 48}) //實體化一個node data為48然後把記憶體位置prepend進linkedList
+	mylist.prepend(&Node{data: 18})
+	mylist.prepend(&Node{data: 16})
+	mylist.prepend(&Node{data: 11})
+	mylist.prepend(&Node{data: 7})
+	mylist.prepend(&Node{data: 2})
 	mylist.append(17)
 	mylist.printListData()
 	mylist.insert(5,43)
