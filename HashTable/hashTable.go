@@ -8,6 +8,8 @@ HashTable指透過一個Hash function產生一組數字
 當作array的index把要儲存的資料放在該index，
 如果有資料的index重複，則用Linked List儲存在同一個index下。
 集合linked list優點與array優點的資料結構
+參考Junmin Lee Data Structures in Golang - Hash Tables教學，url：
+https://www.youtube.com/watch?v=zLnJcAt1aKs&t=656s
 */
 
 const ArraySize = 7 
