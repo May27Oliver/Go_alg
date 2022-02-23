@@ -10,6 +10,8 @@ HashTable指透過一個Hash function產生一組數字
 集合linked list優點與array優點的資料結構
 參考Junmin Lee Data Structures in Golang - Hash Tables教學，url：
 https://www.youtube.com/watch?v=zLnJcAt1aKs&t=656s
+
+以golang來說，要有整個HashTable的type，其下接上Linked List的type，再接下來則有Linked List的node type
 */
 
 const ArraySize = 7 

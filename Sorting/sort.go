@@ -116,16 +116,15 @@ func selectionSort(arr []int) []int {
 */
 
 func mergeSort(arr []int) []int {
-	// fmt.Println("拆分 arr", arr)
-	//拆分
-	if len(arr) > 1 {
-		midIdx := len(arr) / 2
-		arr_left := mergeSort(arr[:midIdx])
-		arr_right := mergeSort(arr[midIdx:])
-		//合併
-		return merge(arr_left, arr_right)
+	if len(arr) < 2{
+		return arr
 	}
-	return arr
+	//拆分
+	midIdx := len(arr) / 2
+	arr_left := mergeSort(arr[:midIdx])
+	arr_right := mergeSort(arr[midIdx:])
+	//合併
+	return merge(arr_left, arr_right)
 }
 
 func merge(left_arr, right_arr []int) []int {
@@ -301,7 +300,6 @@ func left(i int) int {
 func right(i int) int {
 	return i*2 + 2
 }
-
 type MinHeap struct {
 	arr []int
 }
