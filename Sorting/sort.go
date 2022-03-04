@@ -228,7 +228,7 @@ Heap sort
 5. func HeapifyDown, let the node of index get from parameter compare with their child nodes,if smaller than child node, swap it ,until node of index find the right place to go.
 6. func swap , switch two element's position in slice.
 7. parent, left, right,got index and find their parent, left child, right child.
-
+8. 實踐priority queue最有效率的方法。
 maxHeapifyDown 是O(log n)
 maxHeapifyUp 也是O(log n)
 */
