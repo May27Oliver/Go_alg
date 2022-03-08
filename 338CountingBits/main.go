@@ -25,37 +25,72 @@ func main(){
 // 	return c % 2 + total(c / 2)
 // }
 
-func countBiOneInHex(n int) int {
-	countOne:=0
-	switch n {
-		case 0:
-			countOne = 0
+// func countBiOneInHex(n int) int {
+// 	countOne:=0
+// 	switch n {
+// 		case 0:
+// 			countOne = 0
+// 		case 1,2,4,8:
+// 			countOne = 1
+// 		case 3,5,6,9,10,12:
+// 			countOne = 2
+// 		case 7,11,13,14:
+// 			countOne = 3
+// 		case 15:
+// 			countOne = 4
+// 	}
+// 	return countOne
+// }
+
+// func countBinaryOne(n int)int{
+// 	r:=0
+// 	countOne:=0
+// 	for n > 0 {
+// 		n, r = n >> 4, n % 16 
+// 		countOne += countBiOneInHex(r)
+// 	}
+// 	return countOne
+// }
+
+// func countBits(n int) []int {
+// 	s:= make([]int ,n+1)
+// 	for i:=0;i<=n;i++{
+// 		s[i] = countBinaryOne(i)
+// 	}
+// 	return s
+// }
+func countOneTimes(r int) int {
+	var n int
+	switch r {
 		case 1,2,4,8:
-			countOne = 1
+			n = 1
 		case 3,5,6,9,10,12:
-			countOne = 2
+			n = 2
 		case 7,11,13,14:
-			countOne = 3
+			n = 3
 		case 15:
-			countOne = 4
+			n = 4	
 	}
-	return countOne
+	return n
 }
 
 func countBinaryOne(n int)int{
-	r:=0
-	countOne:=0
+	//把i化作二進位數
+	var r int
+	sum := 0
 	for n > 0 {
-		n, r = n >> 4, n % 16 
-		countOne += countBiOneInHex(r)
+		n,r = n>>4,n%16
+		sum += countOneTimes(r)
 	}
-	return countOne
+	return sum	
 }
 
-func countBits(n int) []int {
-	s:= make([]int ,n+1)
-	for i:=0;i<=n;i++{
+func countBits(n int)[]int{
+	var list []int
+	s := make([]int,n+1)
+	for i := 0; i <= n; i += 1 {
 		s[i] = countBinaryOne(i)
 	}
-	return s
+
+	return list
 }
