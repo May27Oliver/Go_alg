@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 func main(){
 	a:=[]int{5,3,6,1,3}
@@ -8,48 +10,77 @@ func main(){
 	fmt.Println(s)
 }
 
-func Solution(A []int, K int) int {
-	// write your code in Go 1.4
-	//刪去K個值，讓陣列裡的差距最小
-	//先把陣列按順序大小排好
-	arr:= mergeSort(A)
-	fmt.Print(arr)
-	return 1
-}
-func mergeSort(arr []int) []int {
-	if len(arr) < 2{
-		return arr
-	}
-	//拆分
-	midIdx := len(arr) / 2
-	arr_left := mergeSort(arr[:midIdx])
-	arr_right := mergeSort(arr[midIdx:])
-	//合併
-	return merge(arr_left, arr_right)
+type MaxHeap struct{
+	arr []int
 }
 
-func merge(left_arr, right_arr []int) []int {
-	// fmt.Println("合併left_arr", left_arr, "right_arr", right_arr)
-	final := []int{}
-	i := 0
-	j := 0
-	for i < len(left_arr) && j < len(right_arr) {
-		if left_arr[i] < right_arr[j] {
-			final = append(final, left_arr[i])
-			i++
-		} else {
-			final = append(final, right_arr[j])
-			j++
+func (h *MaxHeap) Insert(value int){
+	h.arr = append(h.arr,value)
+	h.maxHeapifyUp(len(h.arr)-1)
+}
+
+func (h *MaxHeap) maxHeapifyUp(i int) {
+	for h.arr[i] > h.arr[parent(i)] {
+		h.swap(i, parent(i))
+		i = parent(i)
+	}
+}
+
+func parent(i int) int {
+	return (i - 1) / 2
+}
+
+func left(i int) int {
+	return i*2 + 1
+}
+
+func right(i int) int {
+	return i*2 + 2
+}
+
+func (h *MaxHeap) swap(i1, i2 int) {
+	h.arr[i1], h.arr[i2] = h.arr[i2], h.arr[i1]
+}
+
+func Solution(A []int, K int) int {
+	// write your code in Go 1.4
+	/*
+	思路：
+	用MaxHeap排序刪除連續K值後的陣列，紀錄最小的amptitude，存放入一個陣列，最後找出陣列最小的amptitude
+	*/
+	var counter []int//紀錄各個amptitude
+	var record [][]int//紀錄各個arr
+	var start,end = 0, K
+	for end <= len(A){
+		//Heap裡的arr紀錄的是各個arr去掉連續K個值後，最大和次大的數的差距
+		m:=&MaxHeap{}
+		for i := 0;i < len(A);i++ {
+			if i < start || i > end - 1 {
+				m.Insert(A[i])
+			}
+		}
+		//Heap node與左右子數相減，紀錄最小的值，最小的存進counter內
+		left_amptitude:=m.arr[0]-m.arr[1]
+		right_amptitude:=m.arr[0]-m.arr[2]
+		if left_amptitude < right_amptitude{
+			counter = append(counter, left_amptitude)
+		}else{
+			counter = append(counter,right_amptitude)
+		}
+		record = append(record,m.arr)
+		end++
+		start++
+	}
+	fmt.Println(counter)
+	minAmptitude := 1000000//先假設minAmptitude為一無窮大數
+	KstartAt := 0
+	for i,v:=range counter{
+		if minAmptitude > v{
+			minAmptitude = v
+			KstartAt = i
 		}
 	}
-	//上面迴圈跑完，左右陣列一定還會遺留一些值，大於final內的任何值，下面用loop將之加入
-	// fmt.Println("合併run after for", final)
-	for ; i < len(left_arr); i++ {
-		final = append(final, left_arr[i])
-	}
-	for ; j < len(right_arr); j++ {
-		final = append(final, right_arr[j])
-	}
-	// fmt.Println("合併run after append", final)
-	return final
+	fmt.Println(record[KstartAt])
+	//找出counter內最小的值，紀錄其key值，就是K值
+	return minAmptitude
 }
