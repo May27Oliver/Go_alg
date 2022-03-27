@@ -18,7 +18,7 @@ func Solution(S string) int {
 	num, _:= strconv.ParseInt(S, 2, 0)
 	V,count := int(num),1
 	for V > 1{
-		if V % 2 == 0{
+		if V % 2 == 0{//奇數減一，偶數除二，直到V == 0,用count紀錄次數
 			V = V / 2
 		}else{
 			V = V - 1
