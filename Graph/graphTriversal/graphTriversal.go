@@ -90,6 +90,7 @@ func (g *Graph) BFS(starter *Vertex){
 	}
 }
 
+//深度優先法
 func (g *Graph) DFS(starter *Vertex,count int){
 	starter.visited = true
 	if count == len(g.vertices){
